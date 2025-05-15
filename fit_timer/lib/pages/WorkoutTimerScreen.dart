@@ -147,7 +147,7 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
             isRunningBreak = false;
             stop();
             reset();
-            isBreak = true;
+            isBreak = false;
             isRunningSet = true;
             stopwatch.reset();
             start();
