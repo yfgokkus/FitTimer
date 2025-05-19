@@ -1,4 +1,4 @@
-import 'package:fit_timer/pages/WorkoutTimerScreen.dart';
+import 'package:fit_timer/pages/WorkoutTimerPage.dart';
 import 'package:flutter/material.dart';
 
 void main() {

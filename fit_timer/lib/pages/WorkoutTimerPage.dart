@@ -39,7 +39,6 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
         }else{
           setTimer = format(stopwatch.elapsed);
         }
-
       });
     });
   }
@@ -147,7 +146,7 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
             isRunningBreak = false;
             stop();
             reset();
-            isBreak = true;
+            isBreak = false;
             isRunningSet = true;
             stopwatch.reset();
             start();
@@ -197,7 +196,12 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
         children: [
           const Expanded(
               flex:1,
-              child: Row()
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+
+                ],
+              ),
           ),
           Expanded(
             flex: 5,
