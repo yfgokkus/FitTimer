@@ -10,6 +10,14 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Column(
+        children: [
+          Expanded(child: TextButton(onPressed: () =>{}, child: const Text("Programs"))),
+          Expanded(child: TextButton(onPressed: () =>{}, child: Text("Programs"))),
+        ],
+      ),
+    );
   }
 }
