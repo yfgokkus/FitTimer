@@ -151,4 +151,10 @@ class WorkoutProvider with ChangeNotifier implements WorkoutService{
 
     notifyListeners();
   }
+
+  @override
+  Future<void> startWorkout(int workoutId) {
+    // TODO: implement startWorkout
+    throw UnimplementedError();
+  }
 }

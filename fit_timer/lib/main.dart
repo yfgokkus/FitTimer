@@ -1,4 +1,6 @@
-import 'package:fit_timer/pages/WorkoutTimerPage.dart';
+//import 'package:fit_timer/pages/HomePage.dart';
+import 'package:fit_timer/pages/ProgramListPage.dart';
+//import 'package:fit_timer/pages/WorkoutTimerPage.dart';
 import 'package:fit_timer/state/concrete/WorkoutProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -22,7 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: WorkoutTimerScreen(),
+      home: ProgramListPage(),
       debugShowCheckedModeBanner: false,
     );
   }

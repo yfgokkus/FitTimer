@@ -9,4 +9,5 @@ abstract class WorkoutService {
   Future<void> addExercise(int workoutId, Exercise exercise);
   Future<void> removeExercise(int workoutId, int exerciseId);
   Future<void> reorderWorkout(int workoutId, int current, int next);
+  Future<void> startWorkout(int workoutId);
 }
