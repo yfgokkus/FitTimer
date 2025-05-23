@@ -38,7 +38,7 @@ class _ProgramListPageState extends State<ProgramListPage> {
       backgroundColor: Colors.black,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(30),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -47,9 +47,10 @@ class _ProgramListPageState extends State<ProgramListPage> {
                 style: TextStyle(
                   color: Color(0xFFC1FF72),
                   fontSize: 14,
+                  fontWeight: FontWeight.bold
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
@@ -69,7 +70,7 @@ class _ProgramListPageState extends State<ProgramListPage> {
                       onSubmitted: (_) => _addProgram(),
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 20),
                   GestureDetector(
                     onTap: _addProgram,
                     child: Text(
