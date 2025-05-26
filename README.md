@@ -1,16 +1,9 @@
 # fit_timer
 
-A new Flutter project.
+A timer and an organizing assistant for your workouts..
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Sometimes you may have difficulty planning your workouts and feel that you are wasting your time or not using it efficiently. That's why I designed FitTimer.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+THE DESIGN (May change before I finish the project): https://www.canva.com/design/DAGm3V_K8KI/BYpNlRQG-xipvub9XFc8IA/edit?utm_content=DAGm3V_K8KI&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
