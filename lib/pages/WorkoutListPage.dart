@@ -2,7 +2,6 @@ import 'package:fit_timer/state/concrete/WorkoutProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../entity/Workout.dart';
 
 class WorkoutListPage extends StatefulWidget {
   const WorkoutListPage({super.key});
