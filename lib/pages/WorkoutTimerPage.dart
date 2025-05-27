@@ -2,15 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-class WorkoutTimerScreen extends StatefulWidget {
-  const WorkoutTimerScreen({super.key});
+class WorkoutTimerPage extends StatefulWidget {
+  const WorkoutTimerPage({super.key});
 
   @override
-  State<WorkoutTimerScreen> createState() => _WorkoutTimerScreenState();
+  State<WorkoutTimerPage> createState() => _WorkoutTimerPageState();
 }
 
 
-class _WorkoutTimerScreenState extends State<WorkoutTimerScreen> {
+class _WorkoutTimerPageState extends State<WorkoutTimerPage> {
   final Stopwatch stopwatch = Stopwatch();
   Timer? timer;
 

@@ -2,13 +2,14 @@ import '../../entity/Exercise.dart';
 import '../../entity/Workout.dart';
 
 abstract class WorkoutService {
-  Future<Workout> getWorkoutById(int workoutId);
-  Future<void> createWorkout(int id, String name, List<Exercise> exercises, DateTime dateCreated);
-  Future<List<Workout>> getAllWorkouts();
-  Future<Exercise> getExerciseById(int workoutId, int exerciseId);
-  Future<void> addExercise(int workoutId, String name, int sets, int reps);
-  Future<void> removeExercise(int workoutId, int exerciseId);
-  Future<void> reorderExercises(int workoutId, int current, int next);
-  Future<void> startWorkout(int workoutId);
-  Future<void> stopWorkout();
+  Workout? getWorkoutById(int workoutId);
+  void addWorkout(String name, List<Exercise> exercises, DateTime dateCreated);
+  void removeWorkout(int id);
+  List<Workout> getAllWorkouts();
+  Exercise? getExerciseById(int workoutId, int exerciseId);
+  void addExercise(int workoutId, String name, int sets, int reps);
+  void removeExercise(int workoutId, int exerciseId);
+  void reorderExercises(int workoutId, int current, int next);
+  void startWorkout(int workoutId);
+  void stopWorkout();
 }
