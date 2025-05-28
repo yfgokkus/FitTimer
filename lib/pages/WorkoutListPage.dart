@@ -2,6 +2,8 @@ import 'package:fit_timer/state/concrete/WorkoutProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'WorkoutPage.dart';
+
 
 class WorkoutListPage extends StatefulWidget {
   const WorkoutListPage({super.key});
@@ -48,12 +50,22 @@ class _WorkoutListPageState extends State<WorkoutListPage> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      onSubmitted: (_) => {}, //Provider.of<WorkoutProvider>(context, listen: false).addWorkout(name, [], dateCreated)
+                      onSubmitted: (value) {
+                        final trimmed = value.trim();
+                        if(trimmed.isNotEmpty){
+                          Provider.of<WorkoutProvider>(context, listen: false)
+                              .addWorkout(trimmed, [], DateTime.now());
+                        }
+                      },
                     ),
                   ),
                   const SizedBox(width: 20),
                   GestureDetector(
-                    onTap: () => {},
+                    onTap: () {
+                      Provider.of<WorkoutProvider>(context, listen: false)
+                          .addWorkout(_controller.text, [], DateTime.now());
+                      _controller.clear();
+                    },
                     child: Text(
                       'Ekle',
                       style: TextStyle(
@@ -75,7 +87,7 @@ class _WorkoutListPageState extends State<WorkoutListPage> {
                       itemBuilder: (context, index) {
                         final workout = workoutList[index];
                         return Dismissible(
-                          key: Key((workout.id).toString()),
+                          key: ValueKey("workout_${workout.id}"),
                           direction: DismissDirection.endToStart,
                           onDismissed: (direction) => provider.removeWorkout(workout.id),
                           background: Container(
@@ -84,29 +96,37 @@ class _WorkoutListPageState extends State<WorkoutListPage> {
                             color: Colors.red,
                             child: const Icon(Icons.delete, color: Colors.white),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Row(
-                              children: [
-                                const Text(
-                                  '• ',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    workout.name,
-                                    style: const TextStyle(
+                          child: GestureDetector(
+                            onTap: () => {Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                            builder: (context) => WorkoutPage(id: workout.id),
+                            ),
+                            )},
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Row(
+                                children: [
+                                  const Text(
+                                    '• ',
+                                    style: TextStyle(
                                       color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      letterSpacing: 1,
+                                      fontSize: 18,
                                     ),
                                   ),
-                                ),
-                              ],
+                                  Expanded(
+                                    child: Text(
+                                      workout.name,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         );

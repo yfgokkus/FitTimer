@@ -1,7 +1,10 @@
+import 'package:fit_timer/state/concrete/WorkoutProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class WorkoutPage extends StatefulWidget {
-  const WorkoutPage({super.key});
+  final int id;
+  const WorkoutPage({super.key, required this.id});
 
   @override
   State<WorkoutPage> createState() => _WorkoutPageState();
@@ -12,27 +15,16 @@ class _WorkoutPageState extends State<WorkoutPage> {
   final TextEditingController setsController = TextEditingController();
   final TextEditingController repsController = TextEditingController();
 
-  List<Map<String, String>> exercises = [
-    {'name': 'Leg Press', 'sets': '4x12'},
-    {'name': 'Bench Press', 'sets': '4x12'},
-    {'name': 'Pull down', 'sets': '3x12'},
-    {'name': 'Shoulder Press', 'sets': '4x10'},
-    {'name': 'Incline Press', 'sets': '4x10'},
-    {'name': 'Face pull', 'sets': '4x10'},
-    {'name': 'Push down', 'sets': '4x10'},
-    {'name': 'Biceps curl', 'sets': '4x10'},
-    {'name': 'Crunch', 'sets': '3x15'},
-    {'name': 'Stretch', 'sets': '4x10'},
-  ];
 
   void _addExercise() {
-    final name = nameController.text.trim();
-    final sets = setsController.text.trim();
-    final reps = repsController.text.trim();
+    final String name = nameController.text.trim();
+    final int sets = int.tryParse(setsController.text.trim()) ?? -1;
+    final int reps = int.tryParse(repsController.text.trim()) ?? -1;
 
-    if (name.isNotEmpty && sets.isNotEmpty && reps.isNotEmpty) {
+    if (name.isNotEmpty && sets.isNegative && reps.isNegative) {
+      Provider.of<WorkoutProvider>(context, listen: false)
+          .addExercise(widget.id, name, sets, reps);
       setState(() {
-        exercises.add({'name': name, 'sets': '${sets}x$reps'});
         nameController.clear();
         setsController.clear();
         repsController.clear();
@@ -76,10 +68,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
     );
   }
 
-  void _removeExercise(int index) {
-    setState(() {
-      exercises.removeAt(index);
-    });
+  void _removeExercise(int exerciseId) {
+    Provider.of<WorkoutProvider>(context, listen: false)
+        .removeExercise(widget.id, exerciseId);
   }
 
   @override
