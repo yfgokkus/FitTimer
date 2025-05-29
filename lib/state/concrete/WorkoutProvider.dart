@@ -104,7 +104,7 @@ class WorkoutProvider with ChangeNotifier implements WorkoutService{
   }
 
   @override
-  void removeExercise(int workoutId, int exerciseId) {
+  void removeExerciseById(int workoutId, int exerciseId) {
     Workout? workout = getWorkoutById(workoutId);
     if (workout == null) {
       throw Exception("Workout with ID $workoutId not found.");
@@ -163,4 +163,15 @@ class WorkoutProvider with ChangeNotifier implements WorkoutService{
     hasStarted = false;
     notifyListeners();
   }
+
+  void changeExercise(int workoutId) {
+    Workout? workout = getWorkoutById(workoutId);
+    if (workout == null) {
+      throw Exception("Workout with ID $workoutId not found.");
+    }
+    currentProgramId = -1;
+    hasStarted = false;
+    notifyListeners();
+  }
+
 }

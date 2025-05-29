@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:fit_timer/entity/Exercise.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutTimerPage extends StatefulWidget {
-  const WorkoutTimerPage({super.key});
+  final int? workoutId;
+  const WorkoutTimerPage({super.key, this.workoutId});
 
   @override
   State<WorkoutTimerPage> createState() => _WorkoutTimerPageState();
@@ -13,6 +15,7 @@ class WorkoutTimerPage extends StatefulWidget {
 class _WorkoutTimerPageState extends State<WorkoutTimerPage> {
   final Stopwatch stopwatch = Stopwatch();
   Timer? timer;
+  Exercise? currentExercise;
 
   static String breakTimer = "00:00:00";
   static String setTimer = "00:00:00";
@@ -194,12 +197,18 @@ class _WorkoutTimerPageState extends State<WorkoutTimerPage> {
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          const Expanded(
+          Expanded(
               flex:1,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
+                  GestureDetector(
+                    child: Icon(Icons.play_arrow),
+                  ),
+                  Text("current exercise"),
+                  GestureDetector(
+                    child: Icon(Icons.play_arrow)
+                  )
                 ],
               ),
           ),

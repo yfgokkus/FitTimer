@@ -8,7 +8,7 @@ abstract class WorkoutService {
   List<Workout> getAllWorkouts();
   Exercise? getExerciseById(int workoutId, int exerciseId);
   void addExercise(int workoutId, String name, int sets, int reps);
-  void removeExercise(int workoutId, int exerciseId);
+  void removeExerciseById(int workoutId, int exerciseId);
   void reorderExercises(int workoutId, int current, int next);
   void startWorkout(int workoutId);
   void stopWorkout();

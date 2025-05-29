@@ -1,4 +1,4 @@
-import 'package:fit_timer/pages/WorkoutPage.dart';
+import 'package:fit_timer/pages/WorkoutTimerPage.dart';
 import 'package:fit_timer/state/concrete/WorkoutProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -50,7 +50,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: WorkoutPage(),
+      home: WorkoutTimerPage(),
       debugShowCheckedModeBanner: false,
     );
   }
