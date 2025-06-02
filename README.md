@@ -1,6 +1,6 @@
 # fit_timer
 
-A timer and an organizing assistant for your workouts..
+A stopwatch and an organizing assistant for your workouts..
 
 ## Getting Started
 
