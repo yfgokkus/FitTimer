@@ -1,18 +1,18 @@
 import 'dart:convert';
 import 'package:fit_timer/entity/Exercise.dart';
+import 'package:fit_timer/entity/ProgramState.dart';
 import 'package:fit_timer/entity/Workout.dart';
 import 'package:fit_timer/state/abstract/WorkoutService.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:collection/collection.dart';
 
-class WorkoutProvider with ChangeNotifier implements WorkoutService{
-
+class WorkoutProvider with ChangeNotifier implements WorkoutService {
   final SharedPreferences? _prefs;
   List<Workout> _workouts = [];
 
   bool hasStarted = false;
-  int currentProgramId = -1;
+  ProgramState programState = ProgramState();
   int lastId = 0;
   WorkoutProvider._(this._prefs);
 
@@ -24,7 +24,6 @@ class WorkoutProvider with ChangeNotifier implements WorkoutService{
   }
 
   Future<void> _loadPrefs() async {
-
     lastId = _prefs?.getInt('last_id') ?? 0;
 
     final workoutsJson = _prefs?.getString('workouts');
@@ -35,23 +34,26 @@ class WorkoutProvider with ChangeNotifier implements WorkoutService{
       _workouts = decoded.map((e) => Workout.fromJson(e)).toList();
     }
 
-    hasStarted = _prefs?.getBool('has_started') ?? false;
-    if (hasStarted) {
-      currentProgramId = _prefs?.getInt('current_workout_id') ?? 0;
+    final progStateJson = _prefs?.getString('program_state');
+    if (progStateJson == null) {
+      programState = ProgramState();
+    } else {
+      final decoded = jsonDecode(progStateJson);
+      programState = ProgramState.fromJson(decoded);
     }
     notifyListeners();
   }
 
   Future<void> saveToPrefs() async {
-    final encoded = jsonEncode(_workouts.map((w) => w.toJson()).toList());
+    final encWorkouts = jsonEncode(_workouts.map((w) => w.toJson()).toList());
+    final encProgState = jsonEncode(programState);
     await _prefs?.setInt("last_id", lastId);
-    await _prefs?.setString('workouts', encoded);
-    await _prefs?.setInt('current_workout_id', currentProgramId);
-    await _prefs?.setBool('has_started', hasStarted);
+    await _prefs?.setString('workouts', encWorkouts);
+    await _prefs?.setString('program_state', encProgState);
   }
 
   @override
-  void addWorkout(String name, List<Exercise> exercises, DateTime dateCreated)  {
+  void addWorkout(String name, List<Exercise> exercises, DateTime dateCreated) {
     lastId++;
     final newWorkout = Workout(lastId, name, exercises, dateCreated);
     _workouts.add(newWorkout);
@@ -59,7 +61,7 @@ class WorkoutProvider with ChangeNotifier implements WorkoutService{
   }
 
   @override
-  void removeWorkout(int id)  {
+  void removeWorkout(int id) {
     _workouts.removeWhere((w) => w.id == id);
     notifyListeners();
   }
@@ -79,7 +81,7 @@ class WorkoutProvider with ChangeNotifier implements WorkoutService{
     if (workout == null) {
       throw Exception("Workout with ID $workoutId not found.");
     }
-    lastId ++;
+    lastId++;
     final newExercise = Exercise(lastId, name, sets, reps);
     workout.exercises.add(newExercise);
     notifyListeners();
@@ -93,9 +95,7 @@ class WorkoutProvider with ChangeNotifier implements WorkoutService{
     }
 
     try {
-      final exercise = workout.exercises.firstWhere(
-            (e) => e.id == exerciseId
-      );
+      final exercise = workout.exercises.firstWhere((e) => e.id == exerciseId);
 
       return exercise;
     } catch (e) {
@@ -111,8 +111,7 @@ class WorkoutProvider with ChangeNotifier implements WorkoutService{
     }
 
     try {
-      workout.exercises
-          .removeWhere((exercise) => exercise.id == exerciseId);
+      workout.exercises.removeWhere((exercise) => exercise.id == exerciseId);
 
       notifyListeners();
     } catch (e, stack) {
@@ -120,7 +119,6 @@ class WorkoutProvider with ChangeNotifier implements WorkoutService{
       rethrow;
     }
   }
-
 
   @override
   void reorderExercises(int workoutId, int current, int next) {
@@ -132,7 +130,10 @@ class WorkoutProvider with ChangeNotifier implements WorkoutService{
     try {
       final exercises = workout.exercises;
 
-      if (current < 0 || current >= exercises.length || next < 0 || next >= exercises.length) {
+      if (current < 0 ||
+          current >= exercises.length ||
+          next < 0 ||
+          next >= exercises.length) {
         throw Exception("Invalid index for reordering exercises.");
       }
 
@@ -146,32 +147,90 @@ class WorkoutProvider with ChangeNotifier implements WorkoutService{
   }
 
   @override
-  void startWorkout(int workoutId) {
-    Workout? workout = getWorkoutById(workoutId);
-    if (workout == null) {
-      throw Exception("Workout with ID $workoutId not found.");
+  void finishSet() {
+    if(!programState.selected || programState.currentExercise == null) {
+      return;
     }
-
-    currentProgramId = workoutId;
-    hasStarted = true;
+    int exerciseId = programState.currentExercise!.id;
+    programState.setsCompleted[exerciseId] = (programState.setsCompleted[exerciseId] ?? 0) + 1;
     notifyListeners();
   }
 
   @override
-  void stopWorkout() {
-    currentProgramId = -1;
-    hasStarted = false;
-    notifyListeners();
+  void undoOneSet(){
+    if(!programState.selected || programState.currentExercise == null) {
+      return;
+    }
+    int exerciseId = programState.currentExercise!.id;
+    final current = programState.setsCompleted[exerciseId] ?? 0;
+    if(current > 0){
+      programState.setsCompleted[exerciseId] = current - 1;
+      notifyListeners();
+    }
   }
 
-  void changeExercise(int workoutId) {
+  @override
+  void selectWorkout(int workoutId, int? exerciseId) {
+    if (programState.selected) return;
+
     Workout? workout = getWorkoutById(workoutId);
     if (workout == null) {
       throw Exception("Workout with ID $workoutId not found.");
     }
-    currentProgramId = -1;
-    hasStarted = false;
+
+    final exercise = exerciseId != null
+        ? workout.exercises.firstWhere(
+          (e) => e.id == exerciseId,
+      orElse: () => throw Exception("Exercise with ID $exerciseId not found in workout."),
+    )
+        : workout.exercises.first;
+
+    programState = ProgramState(true, workout, exercise);
     notifyListeners();
   }
 
+  @override
+  void leaveWorkout() {
+    if (!programState.selected) {
+      return;
+    }
+    programState = ProgramState();
+    notifyListeners();
+  }
+
+  @override
+  void nextExercise() {
+    if (!programState.selected ||
+        programState.currentProgram == null ||
+        programState.currentExercise == null) {
+      return;
+    }
+
+    List<Exercise> exercises = programState.currentProgram!.exercises;
+    int currentIndex = exercises.indexWhere(
+      (e) => e.id == programState.currentExercise!.id,
+    );
+
+    if (currentIndex + 1 < exercises.length) {
+      programState.currentExercise = exercises[currentIndex + 1];
+      notifyListeners();
+    }
+  }
+
+  @override
+  void prevExercise() {
+    if (!programState.selected ||
+        programState.currentProgram == null ||
+        programState.currentExercise == null) {
+      return;
+    }
+    List<Exercise> exercises = programState.currentProgram!.exercises;
+    int currentIndex = exercises.indexWhere(
+      (e) => e.id == programState.currentExercise!.id,
+    );
+    if (currentIndex > 0) {
+      programState.currentExercise = exercises[currentIndex - 1];
+      notifyListeners();
+    }
+  }
 }

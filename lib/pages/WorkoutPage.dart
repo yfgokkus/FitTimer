@@ -1,8 +1,10 @@
 import 'package:fit_timer/entity/Workout.dart';
 import 'package:fit_timer/state/concrete/WorkoutProvider.dart';
+import 'package:fit_timer/core/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
+import 'package:go_router/go_router.dart';
 import '../entity/Exercise.dart';
 
 class WorkoutPage extends StatefulWidget {
@@ -36,30 +38,34 @@ class _WorkoutPageState extends State<WorkoutPage> {
     }
   }
 
-  Widget _inputField(TextEditingController controller, String label) {
+  Widget _inputField(TextEditingController controller, String label, {bool numbersOnly = false}) {
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: Color(0xFFB4FF00),
+            style: const TextStyle(
+              color: AppTheme.neonGreen,
               fontSize: 13,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 2),
           SizedBox(
-            height: 50, // control total height here
+            height: 50,
             child: TextField(
               controller: controller,
-              style: TextStyle(color: Colors.black, fontSize: 13),
+              keyboardType: numbersOnly ? TextInputType.number : TextInputType.text,
+              inputFormatters: numbersOnly
+                  ? [FilteringTextInputFormatter.digitsOnly]
+                  : null,
+              style: const TextStyle(color: Colors.white, fontSize: 13),
               decoration: InputDecoration(
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: AppTheme.greyCard,
                 isDense: true,
-                contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 border: OutlineInputBorder(
                   borderSide: BorderSide.none,
                   borderRadius: BorderRadius.circular(6),
@@ -80,7 +86,7 @@ class _WorkoutPageState extends State<WorkoutPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppTheme.backgroundBlack,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -91,56 +97,70 @@ class _WorkoutPageState extends State<WorkoutPage> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  workout?.name ?? "bulunamadı",
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      workout?.name ?? "Not Found",
+                      style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.neonGreen,
+                      ),
+                      onPressed: () {
+                        if (workout != null && workout.exercises.isNotEmpty) {
+                          provider.selectWorkout(workout.id, null);
+                          context.go('/timer');
+                        }
+                      },
+                      child: const Text(
+                        "Start Workout",
+                        style: TextStyle(color: AppTheme.backgroundBlack, fontWeight: FontWeight.bold),
+                      )
+                    )
+                  ],
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 Row(
                   children: [
                     _inputField(nameController, "Name"),
                     const SizedBox(width: 10),
-                    _inputField(setsController, "Sets"),
+                    _inputField(setsController, "Sets", numbersOnly: true),
                     const SizedBox(width: 10),
-                    _inputField(repsController, "Repeats"),
+                    _inputField(repsController, "Repeats", numbersOnly: true),
                     const SizedBox(width: 10),
                     GestureDetector(
                       onTap: _addExercise,
-                      child: Icon(Icons.add, color: Color(0xFFB4FF00), size: 30),
+                      child: const Icon(Icons.add, color: AppTheme.neonGreen, size: 30),
                     )
                   ],
                 ),
                 const SizedBox(height: 20),
                 Expanded(
                   child: ReorderableListView.builder(
-                    reverse: true, // key: items start accumulating at bottom
                     itemCount: exercises.length,
                     onReorder: (oldIndex, newIndex) {
-                      // Since the list is reversed visually, swap indices accordingly:
-                      int actualOldIndex = exercises.length - 1 - oldIndex;
-                      int actualNewIndex = exercises.length - 1 - newIndex;
-                      if (actualNewIndex > actualOldIndex) actualNewIndex -= 1;
-
-                      provider.reorderExercises(widget.id, actualOldIndex, actualNewIndex);
+                      if (newIndex > oldIndex) newIndex -= 1;
+                      provider.reorderExercises(widget.id, oldIndex, newIndex);
                     },
                     itemBuilder: (context, index) {
-                      // Because list is reversed, map index to correct data:
-                      final exercise = exercises[exercises.length - 1 - index];
+                      final exercise = exercises[index];
                       return ListTile(
                         key: ValueKey(exercise.id),
                         dense: true,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
                         leading: GestureDetector(
                           onTap: () => _removeExercise(exercise.id),
-                          child: Icon(Icons.remove_circle, color: Colors.redAccent, size: 20),
+                          child: const Icon(Icons.remove_circle, color: Colors.redAccent, size: 20),
                         ),
                         title: Text(
                           exercise.name,
-                          style: TextStyle(color: Colors.white, fontSize: 14),
+                          style: const TextStyle(color: Colors.white, fontSize: 14),
                         ),
                         trailing: Text(
                           '${exercise.sets}x${exercise.reps}',
-                          style: TextStyle(color: Colors.white, fontSize: 14),
+                          style: const TextStyle(color: Colors.white, fontSize: 14),
                         ),
                       );
                     },
@@ -151,9 +171,9 @@ class _WorkoutPageState extends State<WorkoutPage> {
                 Align(
                   alignment: Alignment.bottomLeft,
                   child: IconButton(
-                    icon: Icon(Icons.arrow_back, color: Color(0xFFB4FF00)),
+                    icon: const Icon(Icons.arrow_back, color: AppTheme.neonGreen),
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      context.pop();
                     },
                   ),
                 ),

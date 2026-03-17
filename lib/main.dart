@@ -1,5 +1,7 @@
-import 'package:fit_timer/pages/WorkoutTimerPage.dart';
+import 'package:fit_timer/core/router.dart';
+import 'package:fit_timer/core/theme.dart';
 import 'package:fit_timer/state/concrete/WorkoutProvider.dart';
+import 'package:fit_timer/state/concrete/TimerProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,13 +11,19 @@ void main() async {
   final workoutProvider = await WorkoutProvider.create();
 
   runApp(
-    ChangeNotifierProvider<WorkoutProvider>.value(
-      value: workoutProvider,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<WorkoutProvider>.value(
+          value: workoutProvider,
+        ),
+        ChangeNotifierProvider<TimerProvider>(
+          create: (_) => TimerProvider(workoutProvider: workoutProvider),
+        ),
+      ],
       child: const MyApp(),
     ),
   );
 }
-
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
@@ -26,11 +34,12 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   late WorkoutProvider _provider;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _provider = _provider = Provider.of<WorkoutProvider>(context, listen: false);
+    _provider = Provider.of<WorkoutProvider>(context, listen: false);
   }
 
   @override
@@ -42,19 +51,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.paused || state == AppLifecycleState.detached) {
-      // Save to prefs when app is backgrounded or closed
-      _provider.saveToPrefs(); // Your custom method
+      _provider.saveToPrefs(); 
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: WorkoutTimerPage(),
+    return MaterialApp.router(
+      title: 'FitTimer',
+      theme: AppTheme.darkTheme,
+      routerConfig: appRouter,
       debugShowCheckedModeBanner: false,
     );
   }
 }
-
-
-

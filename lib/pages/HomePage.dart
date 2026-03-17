@@ -1,57 +1,53 @@
-import 'package:fit_timer/pages/WorkoutListPage.dart';
-import 'package:fit_timer/pages/WorkoutTimerPage.dart';
-import 'package:fit_timer/widgets/ClickAnimatedTextButton.dart';
+import 'package:fit_timer/core/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../state/concrete/WorkoutProvider.dart';
+import 'package:go_router/go_router.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final Widget child;
+  const HomePage({super.key, required this.child});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  int _calculateSelectedIndex(BuildContext context) {
+    final String location = GoRouterState.of(context).uri.toString();
+    if (location.startsWith('/programs')) {
+      return 1;
+    }
+    return 0; // default to timer
+  }
+
+  void _onItemTapped(int index, BuildContext context) {
+    if (index == 0) {
+      context.go('/timer');
+    } else {
+      context.go('/programs');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ClickAnimatedTextButton(
-            text: "Programs",
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => WorkoutListPage()));
-            },
+      body: widget.child,
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: AppTheme.greyCard,
+        selectedItemColor: AppTheme.neonGreen,
+        unselectedItemColor: Colors.white70,
+        currentIndex: _calculateSelectedIndex(context),
+        onTap: (index) => _onItemTapped(index, context),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.timer),
+            label: 'Timer',
           ),
-          const SizedBox(height: 20),
-
-          Consumer<WorkoutProvider>(
-            builder: (context, provider, child) {
-              final id = provider.currentProgramId;
-              final workout = provider.getWorkoutById(id);
-
-              if (id == -1 || workout == null) {
-                return const SizedBox.shrink();
-              }
-
-              return ClickAnimatedTextButton(
-                text: "Continue: ${workout.name}",
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => WorkoutTimerPage()));
-                },
-              );
-            },
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list_alt),
+            label: 'Programs',
           ),
         ],
       ),
     );
   }
 }
-
-
-
-

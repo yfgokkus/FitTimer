@@ -10,6 +10,10 @@ abstract class WorkoutService {
   void addExercise(int workoutId, String name, int sets, int reps);
   void removeExerciseById(int workoutId, int exerciseId);
   void reorderExercises(int workoutId, int current, int next);
-  void startWorkout(int workoutId);
-  void stopWorkout();
+  void selectWorkout(int workoutId, int? exerciseId);
+  void leaveWorkout();
+  void prevExercise();
+  void nextExercise();
+  void finishSet();
+  void undoOneSet();
 }
